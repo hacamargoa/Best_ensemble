@@ -1,7 +1,7 @@
 library('plot.matrix')
 library(raster)
 library(ncdf4)
-library(tidyverse)
+#library(tidyverse)
 setwd("C:/Users/Hector/Documents/Pughtam-cropozone/Best Ensemble")
 load("./rice_best_model_agmerra_hist_default_yield_ric_annual_1980_2010_TEST.R_shifted_ts_processed_dt.Rdata");Ricedef<-t(mapi2)
 load("./maize_best_model_agmerra_hist_default_yield_mai_annual_1980_2010_TEST.R_shifted_ts_processed_dt.Rdata");Maizedef<-t(mapi2)
@@ -103,8 +103,8 @@ for (k in 1:3){
   }
     }
   ensemYi[[k]]<-stack(temp1)
-}
-
+  #writeRaster(ensemYi[[k]],paste0("C:/Users/Hector/Documents/Pughtam-cropozone/Best Ensemble/Best_ensemble_outputs/",crop[k],"best_ensemb_1980-2010.nc"),"CDF")
+  }
 
 #checkin the loop output (remember that seconf index in crop_yi is lower that 14 depending on the crop)
 # check1<-extract(crop_yi[[3]][[11]][[1]],Which(ensembras[[3]]==14,cells=TRUE))
