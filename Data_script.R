@@ -36,6 +36,7 @@ for (i in 1:length(crop)){
 names(irrggcm_yi)<-crop;names(nirggcm_yi)<-crop
 
 #extracting the extra files from prysbi2
+
 prysbi2W<-irrggcm_yi[[1]][[13]]
 prysbi2M<-irrggcm_yi[[2]][[13]]
 prysbi2R<-irrggcm_yi[[3]][[11]]

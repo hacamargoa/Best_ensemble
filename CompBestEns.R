@@ -6,11 +6,15 @@ library(ggplot2)
 library(gridExtra)
 library(forecast)
 
+crop<-c("Wheat","Maize","Rice")
 yield_LPJR<-list()
+ensemYi<-list()
 for (i in 1:3){
-  yield_LPJR[[i]]<-stack(paste0("C:/Users/Hector/Documents/Pughtam-cropozone/Global_evaluation_outputs/LPJYield_",crop[i],"_newcrops_1970-2010.nc")) 
+  yield_LPJR[[i]]<-stack(paste0("C:/Users/hac809/Documents/Pughtam-cropozone/Global_evaluation_outputs/LPJYield_",crop[i],"_newcrops_1970-2010.nc")) 
   yield_LPJR[[i]]<-yield_LPJR[[i]][[11:41]]
+  ensemYi[[i]]<-stack(paste0("C:/Users/hac809/Documents/Pughtam-cropozone/Best_Ensemble/Best_ensemble_outputs/",crop[i],"best_ensemb_1980-2010.nc"))
   }
+
 
 Deraster<-function(x){
   df<-list()
@@ -26,6 +30,8 @@ Deraster<-function(x){
 #memory.limit(size=7000)
 yield_LPJdf<-lapply(yield_LPJR,FUN=Deraster)
 yield_BEdf<-lapply(ensemYi,FUN=Deraster)
+
+
 
 cut<-function(x){
   cu<-x[c(-1,-2,-(length(x$year)),-(length(x$year)-1)),]
