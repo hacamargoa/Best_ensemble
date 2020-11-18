@@ -1,8 +1,9 @@
 library('plot.matrix')
 library(raster)
 library(ncdf4)
+library(plyr)
 #library(tidyverse)
-setwd("C:/Users/Hector/Documents/Pughtam-cropozone/Best Ensemble")
+setwd("C:/Users/hac809/Documents/Pughtam-cropozone/Best_Ensemble")
 load("./rice_best_model_agmerra_hist_default_yield_ric_annual_1980_2010_TEST.R_shifted_ts_processed_dt.Rdata");Ricedef<-t(mapi2)
 load("./maize_best_model_agmerra_hist_default_yield_mai_annual_1980_2010_TEST.R_shifted_ts_processed_dt.Rdata");Maizedef<-t(mapi2)
 load("./wheat_best_model_agmerra_hist_default_yield_whe_annual_1980_2010_TEST.R_shifted_ts_processed_dt.Rdata");Wheatdef<-t(mapi2)
@@ -27,9 +28,11 @@ for (i in 1:length(crop)){
     temp2[[j]]<-intersect(list.files(path=paste0("./GGCMI",crop[i]),pattern=ggcms[j]),list.files(path=paste0("./GGCMI",crop[i]),pattern="noirr"))
   }
   names(temp1)<-ggcms;names(temp2)<-ggcms
-  temp1<-compact(temp1);temp2<-compact(temp2)
-  for(j in 1:length(temp1)){temp1[[j]]<-brick(paste0("./GGCMI",crop[i],"/",temp1[[j]]))}
-  for(j in 1:length(temp2)){temp2[[j]]<-brick(paste0("./GGCMI",crop[i],"/",temp2[[j]]))}
+  temp1<-temp1[lapply(temp1,length)>0];temp2<-temp2[lapply(temp2,length)>0]
+  for(j in 1:length(temp1)){temp1[[j]]<-brick(paste0("./GGCMI",crop[i],"/",temp1[[j]]));temp1[[j]][is.na(temp1[[j]])]<-0}
+  for(j in 1:length(temp2)){temp2[[j]]<-brick(paste0("./GGCMI",crop[i],"/",temp2[[j]]));temp2[[j]][is.na(temp2[[j]])]<-0}
+  
+  temp2[is.na(temp2)]<-0
   irrggcm_yi[[i]]<-temp1
   nirggcm_yi[[i]]<-temp2
 }
@@ -51,7 +54,7 @@ cropArirr<-c("SPAMest_Wheatirr_","SPAMest_Maizeirr_","SPAMest_Riceirr_")
 ArNew<-list()
 ArNewi<-list()
 ArNewr<-list()
-setwd("C:/Users/Hector/Documents/Pughtam-cropozone/Global_evaluation_outputs")
+setwd("C:/Users/hac809/Documents/Pughtam-cropozone/Global_evaluation_outputs/Area")
 for (j in 1:length(cropAr)){
   ArNew[[j]]<-list.files(pattern=cropAr[j])
   ArNewi[[j]]<-list.files(pattern=cropArirr[j])
@@ -59,6 +62,7 @@ for (j in 1:length(cropAr)){
   ArNewi[[j]]<-subset(brick(ArNewi[[j]]),20:50)*(ArNew[[j]]/ArNew[[j]])
   ArNewr[[j]]<-ArNew[[j]]-ArNewi[[j]]
 }
+
 
 #Production calculation by model
 Wheatprod<-list()
@@ -85,7 +89,7 @@ crop_yi<-list(Wheatyi,Maizyi,Riceyi)
 #Delete package to avoid conflick with extract of raster
 #.rs.unloadPackage("tidyr")
 
-#
+#convert matrix of ensembles in raster
 ensembras<-list()
 for (i in 1:3){
 ensembras[[i]]<-raster(ensemb[[i]])
@@ -96,6 +100,7 @@ ggcms_ <- c("pdssat","`epic-boku`","`epic-iiasa`","gepic","papsim","pegasus","`l
            "lpjml","`cgms-wofost`","`clm-crop`","`epic-tamu`","`orchidee-crop`","pepic","prysbi2")
 temp1<-list()
 ensemYi<-list()
+ensemPro<-list()
 for (k in 1:3){
   for (i in 1:31){
   temp1[[i]]<-raster(ncols=720,nrows=360)
@@ -105,6 +110,7 @@ for (k in 1:3){
     }
   ensemYi[[k]]<-stack(temp1)
   #writeRaster(ensemYi[[k]],paste0("C:/Users/Hector/Documents/Pughtam-cropozone/Best Ensemble/Best_ensemble_outputs/",crop[k],"best_ensemb_1980-2010.nc"),"CDF")
+  ensemPro[[k]]<-ensemYi[[k]]*ArNew[[k]]
   }
 
 #checkin the loop output (remember that seconf index in crop_yi is lower that 14 depending on the crop)
